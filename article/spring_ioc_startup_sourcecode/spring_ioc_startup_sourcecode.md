@@ -78,7 +78,7 @@ ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applica
  */
 public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
 
-this(new String[] {configLocation}, true, null);
+    this(new String[] {configLocation}, true, null);
 
 }
 ```
@@ -86,16 +86,17 @@ this(new String[] {configLocation}, true, null);
 
 - 1.创建ClassPathXmlApplicationContext时需要指定xml文件的路径作为参数,尽管我们在创建时只指定了一个,但其实可以同时指定多个。
 - 2.Spring容器有父子容器的概念,通过HierarchicalBeanFactory接口定义了具有层级关系的容器体系。而在抽象实现类AbstractApplicationContext类的内部,有一个表示父容器的成员变量
-
-`/\*\* Parent context \*/
-
-private ApplicationContext parent;`
-
+```java
+/**
+ * Parent context
+ */
+private ApplicationContext parent;
+```
 重载函数的第三个参数即表示要创建的ClassPathXmlApplicationContext的父容器,不过这里只需要设置为null。关于Spring的父子容器,还有一些独特的访问规则,子容器可以访问父容器中的Bean,父容器不可以访问子容器中的Bean。不知道这个规则在使用Spring做web开发时可能会碰到一些匪夷所思的问题。
 
 继续跟进源码
-
-`//设置父容器
+```java
+//设置父容器
 
 super(parent);
 
@@ -109,110 +110,61 @@ if (refresh) { //默认为true
 
 refresh();
 
-}`
-
+}
+```
 设置完父容器和xml文件的路径信息后,终于看到了refresh()方法,正如前面提到的,这是真正启动Spring容器的方法,想要知道Spring IOC容器的启动流程,就要知道该方法内部都做了什么。
 
 **2.1 启动容器的真正入口refresh()**
 
 refresh()是定义在AbstractApplicationContext类中的模板方法,定义了容器启动的基本流程,并留下钩子方法供子类进行扩展。
-
-`@Override
-
+```java
+@Override
 public void refresh() throws BeansException, IllegalStateException {
-
-synchronized (this.startupShutdownMonitor) {
-
-// Prepare this context for refreshing.
-
-prepareRefresh();
-
-// Tell the subclass to refresh the internal bean factory.
-
-ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
-
-// Prepare the bean factory for use in this context.
-
-prepareBeanFactory(beanFactory);
-
-try {
-
-// Allows post-processing of the bean factory in context subclasses.
-
-postProcessBeanFactory(beanFactory);
-
-// Invoke factory processors registered as beans in the context.
-
-invokeBeanFactoryPostProcessors(beanFactory);
-
-// Register bean processors that intercept bean creation.
-
-registerBeanPostProcessors(beanFactory);
-
-// Initialize message source for this context.
-
-initMessageSource();
-
-// Initialize event multicaster for this context.
-
-initApplicationEventMulticaster();
-
-// Initialize other special beans in specific context subclasses.
-
-onRefresh();
-
-// Check for listener beans and register them.
-
-registerListeners();
-
-// Instantiate all remaining (non-lazy-init) singletons.
-
-finishBeanFactoryInitialization(beanFactory);
-
-// Last step: publish corresponding event.
-
-finishRefresh();
-
+    synchronized (this.startupShutdownMonitor) {
+        // Prepare this context for refreshing.
+        prepareRefresh();
+        // Tell the subclass to refresh the internal bean factory.
+        ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+        // Prepare the bean factory for use in this context.
+        prepareBeanFactory(beanFactory);
+        try {
+            // Allows post-processing of the bean factory in context subclasses.
+            postProcessBeanFactory(beanFactory);
+            // Invoke factory processors registered as beans in the context.
+            invokeBeanFactoryPostProcessors(beanFactory);
+            // Register bean processors that intercept bean creation.
+            registerBeanPostProcessors(beanFactory);
+            // Initialize message source for this context.
+            initMessageSource();
+            // Initialize event multicaster for this context.
+            initApplicationEventMulticaster();
+            // Initialize other special beans in specific context subclasses.
+            onRefresh();
+            // Check for listener beans and register them.
+            registerListeners();
+            // Instantiate all remaining (non-lazy-init) singletons.
+            finishBeanFactoryInitialization(beanFactory);
+            // Last step: publish corresponding event.
+            finishRefresh();
+        } catch (BeansException ex) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception encountered during context initialization - " +
+                "cancelling refresh attempt: " + ex);
+            }
+            // Destroy already created singletons to avoid dangling resources.
+            destroyBeans();
+            // Reset 'active' flag.
+            cancelRefresh(ex);
+            // Propagate exception to caller.
+            throw ex;
+        } finally {
+            // Reset common introspection caches in Spring's core, since we
+            // might not ever need metadata for singleton beans anymore...
+            resetCommonCaches();
+        }
+    }
 }
-
-catch (BeansException ex) {
-
-if (logger.isWarnEnabled()) {
-
-logger.warn("Exception encountered during context initialization - " +
-
-"cancelling refresh attempt: " + ex);
-
-}
-
-// Destroy already created singletons to avoid dangling resources.
-
-destroyBeans();
-
-// Reset 'active' flag.
-
-cancelRefresh(ex);
-
-// Propagate exception to caller.
-
-throw ex;
-
-}
-
-finally {
-
-// Reset common introspection caches in Spring's core, since we
-
-// might not ever need metadata for singleton beans anymore...
-
-resetCommonCaches();
-
-}
-
-}
-
-}`
-
+```
 启动容器的方法之所以用refresh(刷新)来命名,是为了形象的表达容器可以被重启这层含义。为了防止并发环境下多个线程同时启动IOC容器,整个过程使用同步代码块来进行同步。容器的启动从方法内容上来看并不复杂,流程也十分清晰,从方法名上大概就可以猜到每一步做了什么。
 
 **2.2 容器启动流程的不同阶段**
@@ -227,108 +179,104 @@ resetCommonCaches();
 prepareRefresh();
 
 进去一探究竟
-
-`/\*\*
-
-\* Prepare this context for refreshing, setting its startup date and
-
-\* active flag as well as performing any initialization of property sources.
-
-\*/
-
+```java
+/**
+ * Prepare this context for refreshing, setting its startup date and
+ * active flag as well as performing any initialization of property sources.
+ */
 protected void prepareRefresh() {
 
-//记录容器的启动时间
+    //记录容器的启动时间
 
-this.startupDate = System.currentTimeMillis();
+    this.startupDate = System.currentTimeMillis();
 
-//将容器的关闭标志置位false
+    //将容器的关闭标志置位false
 
-this.closed.set(false);
+    this.closed.set(false);
 
-//将容器的启动标记置位true
+    //将容器的启动标记置位true
 
-this.active.set(true);
+    this.active.set(true);
 
-if (logger.isInfoEnabled()) {
+    if (logger.isInfoEnabled()) {
 
-logger.info("Refreshing " + this);
+        logger.info("Refreshing " + this);
+
+    }
+
+    // Initialize any placeholder property sources in the context environment
+
+    //空实现的钩子方法,供子类重写
+
+    initPropertySources();
+
+    // Validate that all properties marked as required are resolvable
+
+    // see ConfigurablePropertyResolver#setRequiredProperties
+
+    //对必须的系统环境变量进行校验,如果不存在将抛出异常
+
+    getEnvironment().validateRequiredProperties();
+
+    // Allow for the collection of early ApplicationEvents,
+
+    // to be published once the multicaster is available...
+
+    this.earlyApplicationEvents = new LinkedHashSet<ApplicationEvent>();
 
 }
-
-// Initialize any placeholder property sources in the context environment
-
-//空实现的钩子方法,供子类重写
-
-initPropertySources();
-
-// Validate that all properties marked as required are resolvable
-
-// see ConfigurablePropertyResolver#setRequiredProperties
-
-//对必须的系统环境变量进行校验,如果不存在将抛出异常
-
-getEnvironment().validateRequiredProperties();
-
-// Allow for the collection of early ApplicationEvents,
-
-// to be published once the multicaster is available...
-
-this.earlyApplicationEvents = new LinkedHashSet<ApplicationEvent>();
-
-}`
-
+```
 首先记录了容器的启动时间和对容器的状态进行了标记。之后来到了容器为用户提供的第一个扩展点:
-
-`initPropertySources();
+```java
+initPropertySources();
 
 protected void initPropertySources() {
 
 // For subclasses: do nothing by default.
 
-}`
-
+}
+```
 这是一个默认空实现的钩子方法,用户在自定义IOC容器时可以重写,完成一些环境变量属性的初始化工作。
 之后会对一些必要的环境变量信息进行校验
-
-`getEnvironment().validateRequiredProperties();`
-
+```java
+getEnvironment().validateRequiredProperties();
+```
 如果必须的环境变量信息不存在,则会抛出异常
-
-`@Override
+```java
+@Override
 
 public void validateRequiredProperties() {
 
-MissingRequiredPropertiesException ex = new MissingRequiredPropertiesException(); //异常信息集合
+    MissingRequiredPropertiesException ex = new MissingRequiredPropertiesException(); //异常信息集合
 
-for (String key : this.requiredProperties) {
+    for (String key : this.requiredProperties) {
 
-if (this.getProperty(key) == null) {
+        if (this.getProperty(key) == null) {
 
-ex.addMissingRequiredProperty(key); //加入异常信息
+            ex.addMissingRequiredProperty(key); //加入异常信息
+
+        }
+
+    }
+
+    if (!ex.getMissingRequiredProperties().isEmpty()) {
+
+        throw ex;  //抛出异常信息集合
+
+    }
 
 }
-
-}
-
-if (!ex.getMissingRequiredProperties().isEmpty()) {
-
-throw ex;  //抛出异常信息集合
-
-}
-
-}`
-
+```
 结合前面的钩子initPropertySources(),用户在自定义IOC容器时可以完成一些个性化需求,比如要求容器在启动时必须从环境变量中加载某属性值,若该属性值不存在则启动失败。重写initPropertySources()如下
-
-`@Override
+```java
+@Override
 
 protected void initPropertySources() {
 
 getEnvironment().setRequiredProperties("XXXX");
 
-}`
-
+}
+```
 若环境变量不存在则会抛出以下异常
 
 ![](Aspose.Words.fbccafc3-228e-46b4-b031-c34c15624b31.005.png)
