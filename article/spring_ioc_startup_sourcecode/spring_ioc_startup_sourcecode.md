@@ -108,7 +108,7 @@ if (refresh) { //默认为true
 
 //启动Spring容器
 
-refresh();
+    refresh();
 
 }
 ```
@@ -232,7 +232,7 @@ initPropertySources();
 
 protected void initPropertySources() {
 
-// For subclasses: do nothing by default.
+    // For subclasses: do nothing by default.
 
 }
 ```
@@ -273,7 +273,7 @@ public void validateRequiredProperties() {
 
 protected void initPropertySources() {
 
-getEnvironment().setRequiredProperties("XXXX");
+    getEnvironment().setRequiredProperties("XXXX");
 
 }
 ```
