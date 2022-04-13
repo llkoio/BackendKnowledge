@@ -66,24 +66,22 @@ ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applica
 
 下面就正式开始容器启动流程的源码阅读
 进入ClassPathXmlApplicationContext的构造方法,首先调用了重载构造函数
-`/\*\*
-
-\* Create a new ClassPathXmlApplicationContext, loading the definitions
-
-\* from the given XML file and automatically refreshing the context.
-
-\* @param configLocation resource location
-
-\* @throws BeansException if context creation failed
-
-\*/
-
+```java
+/**
+ * Create a new ClassPathXmlApplicationContext, loading the definitions
+ * 
+ * from the given XML file and automatically refreshing the context.
+ * 
+ * @param configLocation resource location
+ *                       
+ * @throws BeansException if context creation failed
+ */
 public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
 
 this(new String[] {configLocation}, true, null);
 
 }
-`
+```
 这里有两点需要注意下:
 
 - 1.创建ClassPathXmlApplicationContext时需要指定xml文件的路径作为参数,尽管我们在创建时只指定了一个,但其实可以同时指定多个。
