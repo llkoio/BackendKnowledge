@@ -346,3 +346,5 @@ getEnvironment().setRequiredProperties("XXXX");
 - 3.对容器启动前的准备阶段进行了源码解读
 
 可以看到容器启动源码中对模板方法模式的合理运用。容器启动的流程以模板方法模式定义在了抽象容器类AbstractApplicationContext中,并留下了钩子函数供子类重写。用户实现自定义容器时,可以通过继承并重写钩子函数的方法对原有容器的功能进行扩展,而无需多做其他改动。这样既为用户扩展Spring容器开放了接口,又为用户屏蔽了容器实现的复杂性,很好的实现了Spring容器通用性和扩展性的统一。
+
+文章来源：https://www.cnblogs.com/takumicx/p/9757492.html
