@@ -86,6 +86,7 @@ public ClassPathXmlApplicationContext(String configLocation) throws BeansExcepti
 
 - 1.创建ClassPathXmlApplicationContext时需要指定xml文件的路径作为参数,尽管我们在创建时只指定了一个,但其实可以同时指定多个。
 - 2.Spring容器有父子容器的概念,通过HierarchicalBeanFactory接口定义了具有层级关系的容器体系。而在抽象实现类AbstractApplicationContext类的内部,有一个表示父容器的成员变量
+
 ```java
 /**
  * Parent context
