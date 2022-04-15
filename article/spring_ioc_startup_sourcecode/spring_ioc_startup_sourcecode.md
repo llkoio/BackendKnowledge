@@ -284,7 +284,9 @@ protected void initPropertySources() {
 
 总结下容器启动前的准备工作:主要是对容器状态进行标记,初始化环境变量信息并对必要的环境变量进行校验。
 
-**4. 总结**
+obtainFreshBeanFactory()方法主要作用：是创建BeanFactory对象，并解析xml封装成BeanDefinition对象
+
+**4. 总结（不全）**
 
 这篇文章的主要内容
 
