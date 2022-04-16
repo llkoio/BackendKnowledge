@@ -286,6 +286,9 @@ protected void initPropertySources() {
 
 obtainFreshBeanFactory()方法主要作用：是创建BeanFactory对象，并解析xml封装成BeanDefinition对象
 
+obtainFreshBeanFactory()内部方法调用链比较长，如下：
+![](img.png)
+
 **4. 总结（不全）**
 
 这篇文章的主要内容
