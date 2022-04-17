@@ -289,6 +289,60 @@ obtainFreshBeanFactory()方法主要作用：是创建BeanFactory对象，并解
 obtainFreshBeanFactory()内部方法调用链比较长，如下：
 ![](img.png)
 
+obtainFreshBeanFactory()–>refreshBeanFactory()
+
+refreshBeanFactory()包含的主要方法及作用：
+createBeanFactory()：创建beanFactory（DefaultListableBeanFactory类型）
+setSerializationId：设置序列化Id
+customizeBeanFactory():定制beanFactory
+loadBeanDefinitions():加载bean定义
+
+refreshBeanFactory源码：
+
+```java
+public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
+...
+    protected final void refreshBeanFactory() throws BeansException {
+        //判断是否存在beanFactory
+        if (hasBeanFactory()) {
+            // 如果存在注销所有的单例
+        }
+        destroyBeans();
+        //重置beanFactory
+        try {
+            //创建beanFactory--》DefaultListableBeanFactory
+            DefaultListableBeanFactory beanFactory = createBeanFactory();
+            //设置序列化Id
+            beanFactory.setSerializationId(getId());
+            //设置存在多个重名bean时是否覆盖；设置是否允许循环引用,定制beanFactory
+            customizeBeanFactory(beanFactory);
+            //解析xml，并把xml中标签封装成BeanDefinition对象；
+            loadBeanDefinitions(beanFactory);
+            this.beanFactory = beanFactory;
+        } catch (IOException ex) {
+            throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
+        }
+    }
+}
+...
+```
+refreshBeanFactory()–>customizeBeanFactory(beanFactory)
+
+```java
+protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+    //是否允许覆盖同名称的不同定义的对象
+    if(this.allowBeanDefinitionOverriding!=null) {
+        // 如果属性allowBeanDefinitionOverriding不为空，设置给beanFactory对象相应属性
+        beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
+    }
+    //是否允许bean之间存在循环依赖
+    if(this.allowCircularReferences!=null) {
+        // 如果属性allowCircularReferences不为空，设置给beanFactory对象相应属性
+        beanFactory.setAllowCircularReferences(this.allowCircularReferences);
+    }
+}
+```
+
 **4. 总结（不全）**
 
 这篇文章的主要内容
