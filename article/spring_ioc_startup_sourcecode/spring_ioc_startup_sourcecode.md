@@ -1,16 +1,4 @@
-﻿[Spring IOC容器启动流程源码解析(一)——容器概念详解及源码初探 ](https://www.cnblogs.com/takumicx/p/9757492.html)
-
-目录
-
-- [1.1 IOC容器到底是什么](https://www.cnblogs.com/takumicx/p/9757492.html#11-ioc%E5%AE%B9%E5%99%A8%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88)
-- [1.2 BeanFactory和ApplicationContext的联系以及区别](https://www.cnblogs.com/takumicx/p/9757492.html#12-beanfactory%E5%92%8Capplicationcontext%E7%9A%84%E8%81%94%E7%B3%BB%E4%BB%A5%E5%8F%8A%E5%8C%BA%E5%88%AB)
-- [1.3 解读IOC容器启动流程的意义](https://www.cnblogs.com/takumicx/p/9757492.html#13-%E8%A7%A3%E8%AF%BBioc%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E7%9A%84%E6%84%8F%E4%B9%89)
-- [1.4 如何有效的阅读源码](https://www.cnblogs.com/takumicx/p/9757492.html#14-%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E9%98%85%E8%AF%BB%E6%BA%90%E7%A0%81)
-- [2. 初探IOC容器启动源码](https://www.cnblogs.com/takumicx/p/9757492.html#2-%E5%88%9D%E6%8E%A2ioc%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%BA%90%E7%A0%81)
-  - [2.1 启动容器的真正入口refresh()](https://www.cnblogs.com/takumicx/p/9757492.html#21-%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8%E7%9A%84%E7%9C%9F%E6%AD%A3%E5%85%A5%E5%8F%A3refresh)
-  - [2.2 容器启动流程的不同阶段](https://www.cnblogs.com/takumicx/p/9757492.html#22-%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E7%9A%84%E4%B8%8D%E5%90%8C%E9%98%B6%E6%AE%B5)
-- [3 容器启动前的准备工作](https://www.cnblogs.com/takumicx/p/9757492.html#3-%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C)
-- [4. 总结](https://www.cnblogs.com/takumicx/p/9757492.html#4-%E6%80%BB%E7%BB%93)
+﻿# Spring IOC容器启动流程源码解析
 
 **1.1 IOC容器到底是什么**
 
@@ -74,7 +62,7 @@ ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applica
  * from the given XML file and automatically refreshing the context.
  * 
  * @param configLocation resource location
- *                   
+ *                 
  * @throws BeansException if context creation failed
  */
 public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
@@ -408,8 +396,6 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
  }
 ```
 
-
-
 层层点进去当看到XmlBeanDefinitionReader中第五个注释的`doLoadBeanDefinitions()`，要注意spring源码中但凡do开头的都是实际做事的！！！一定要走进去看:
 
 ```java
@@ -464,14 +450,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 }
 ```
 
-**4. 总结（不全）**
 
-这篇文章的主要内容
 
-- 1.讲解IOC容器的概念和类结构
-- 2.找到容器启动流程的真正入口refresh()方法,将容器启动流程划分为了5个阶段:启动前的准备阶段,初始化核心容器阶段,初始化基础组件阶段,创建单实例bean阶段以及容器启动的收尾阶段
-- 3.对容器启动前的准备阶段进行了源码解读
+参考文献：
 
-可以看到容器启动源码中对模板方法模式的合理运用。容器启动的流程以模板方法模式定义在了抽象容器类AbstractApplicationContext中,并留下了钩子函数供子类重写。用户实现自定义容器时,可以通过继承并重写钩子函数的方法对原有容器的功能进行扩展,而无需多做其他改动。这样既为用户扩展Spring容器开放了接口,又为用户屏蔽了容器实现的复杂性,很好的实现了Spring容器通用性和扩展性的统一。
+https://www.cnblogs.com/takumicx/p/9757492.html
 
-文章来源：https://www.cnblogs.com/takumicx/p/9757492.html
+https://blog.csdn.net/weixin_47061482/article/details/115406384
