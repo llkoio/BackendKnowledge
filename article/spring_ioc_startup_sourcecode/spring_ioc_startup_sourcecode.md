@@ -2,10 +2,10 @@
 
 目录
 
-  - [1.1 IOC容器到底是什么](https://www.cnblogs.com/takumicx/p/9757492.html#11-ioc%E5%AE%B9%E5%99%A8%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88)
-  - [1.2 BeanFactory和ApplicationContext的联系以及区别](https://www.cnblogs.com/takumicx/p/9757492.html#12-beanfactory%E5%92%8Capplicationcontext%E7%9A%84%E8%81%94%E7%B3%BB%E4%BB%A5%E5%8F%8A%E5%8C%BA%E5%88%AB)
-  - [1.3 解读IOC容器启动流程的意义](https://www.cnblogs.com/takumicx/p/9757492.html#13-%E8%A7%A3%E8%AF%BBioc%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E7%9A%84%E6%84%8F%E4%B9%89)
-  - [1.4 如何有效的阅读源码](https://www.cnblogs.com/takumicx/p/9757492.html#14-%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E9%98%85%E8%AF%BB%E6%BA%90%E7%A0%81)
+- [1.1 IOC容器到底是什么](https://www.cnblogs.com/takumicx/p/9757492.html#11-ioc%E5%AE%B9%E5%99%A8%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88)
+- [1.2 BeanFactory和ApplicationContext的联系以及区别](https://www.cnblogs.com/takumicx/p/9757492.html#12-beanfactory%E5%92%8Capplicationcontext%E7%9A%84%E8%81%94%E7%B3%BB%E4%BB%A5%E5%8F%8A%E5%8C%BA%E5%88%AB)
+- [1.3 解读IOC容器启动流程的意义](https://www.cnblogs.com/takumicx/p/9757492.html#13-%E8%A7%A3%E8%AF%BBioc%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E7%9A%84%E6%84%8F%E4%B9%89)
+- [1.4 如何有效的阅读源码](https://www.cnblogs.com/takumicx/p/9757492.html#14-%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E9%98%85%E8%AF%BB%E6%BA%90%E7%A0%81)
 - [2. 初探IOC容器启动源码](https://www.cnblogs.com/takumicx/p/9757492.html#2-%E5%88%9D%E6%8E%A2ioc%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%BA%90%E7%A0%81)
   - [2.1 启动容器的真正入口refresh()](https://www.cnblogs.com/takumicx/p/9757492.html#21-%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8%E7%9A%84%E7%9C%9F%E6%AD%A3%E5%85%A5%E5%8F%A3refresh)
   - [2.2 容器启动流程的不同阶段](https://www.cnblogs.com/takumicx/p/9757492.html#22-%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E7%9A%84%E4%B8%8D%E5%90%8C%E9%98%B6%E6%AE%B5)
@@ -66,6 +66,7 @@ ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applica
 
 下面就正式开始容器启动流程的源码阅读
 进入ClassPathXmlApplicationContext的构造方法,首先调用了重载构造函数
+
 ```java
 /**
  * Create a new ClassPathXmlApplicationContext, loading the definitions
@@ -73,7 +74,7 @@ ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applica
  * from the given XML file and automatically refreshing the context.
  * 
  * @param configLocation resource location
- *                       
+ *                   
  * @throws BeansException if context creation failed
  */
 public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
@@ -82,6 +83,7 @@ public ClassPathXmlApplicationContext(String configLocation) throws BeansExcepti
 
 }
 ```
+
 这里有两点需要注意下:
 
 - 1.创建ClassPathXmlApplicationContext时需要指定xml文件的路径作为参数,尽管我们在创建时只指定了一个,但其实可以同时指定多个。
@@ -93,9 +95,11 @@ public ClassPathXmlApplicationContext(String configLocation) throws BeansExcepti
  */
 private ApplicationContext parent;
 ```
+
 重载函数的第三个参数即表示要创建的ClassPathXmlApplicationContext的父容器,不过这里只需要设置为null。关于Spring的父子容器,还有一些独特的访问规则,子容器可以访问父容器中的Bean,父容器不可以访问子容器中的Bean。不知道这个规则在使用Spring做web开发时可能会碰到一些匪夷所思的问题。
 
 继续跟进源码
+
 ```java
 //设置父容器
 
@@ -113,11 +117,13 @@ if (refresh) { //默认为true
 
 }
 ```
+
 设置完父容器和xml文件的路径信息后,终于看到了refresh()方法,正如前面提到的,这是真正启动Spring容器的方法,想要知道Spring IOC容器的启动流程,就要知道该方法内部都做了什么。
 
 **2.1 启动容器的真正入口refresh()**
 
 refresh()是定义在AbstractApplicationContext类中的模板方法,定义了容器启动的基本流程,并留下钩子方法供子类进行扩展。
+
 ```java
 @Override
 public void refresh() throws BeansException, IllegalStateException {
@@ -166,6 +172,7 @@ public void refresh() throws BeansException, IllegalStateException {
     }
 }
 ```
+
 启动容器的方法之所以用refresh(刷新)来命名,是为了形象的表达容器可以被重启这层含义。为了防止并发环境下多个线程同时启动IOC容器,整个过程使用同步代码块来进行同步。容器的启动从方法内容上来看并不复杂,流程也十分清晰,从方法名上大概就可以猜到每一步做了什么。
 
 **2.2 容器启动流程的不同阶段**
@@ -180,6 +187,7 @@ public void refresh() throws BeansException, IllegalStateException {
 prepareRefresh();
 
 进去一探究竟
+
 ```java
 /**
  * Prepare this context for refreshing, setting its startup date and
@@ -227,7 +235,9 @@ protected void prepareRefresh() {
 
 }
 ```
+
 首先记录了容器的启动时间和对容器的状态进行了标记。之后来到了容器为用户提供的第一个扩展点:
+
 ```java
 initPropertySources();
 
@@ -237,12 +247,16 @@ protected void initPropertySources() {
 
 }
 ```
+
 这是一个默认空实现的钩子方法,用户在自定义IOC容器时可以重写,完成一些环境变量属性的初始化工作。
 之后会对一些必要的环境变量信息进行校验
+
 ```java
 getEnvironment().validateRequiredProperties();
 ```
+
 如果必须的环境变量信息不存在,则会抛出异常
+
 ```java
 @Override
 
@@ -268,7 +282,9 @@ public void validateRequiredProperties() {
 
 }
 ```
+
 结合前面的钩子initPropertySources(),用户在自定义IOC容器时可以完成一些个性化需求,比如要求容器在启动时必须从环境变量中加载某属性值,若该属性值不存在则启动失败。重写initPropertySources()如下
+
 ```java
 @Override
 
@@ -278,6 +294,7 @@ protected void initPropertySources() {
 
 }
 ```
+
 若环境变量不存在则会抛出以下异常
 
 ![](Aspose.Words.fbccafc3-228e-46b4-b031-c34c15624b31.005.png)
@@ -326,6 +343,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 }
 ...
 ```
+
 refreshBeanFactory()–>customizeBeanFactory(beanFactory)
 
 ```java
@@ -340,6 +358,109 @@ protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
         // 如果属性allowCircularReferences不为空，设置给beanFactory对象相应属性
         beanFactory.setAllowCircularReferences(this.allowCircularReferences);
     }
+}
+```
+
+refreshBeanFactory()–>loadBeanDefinitions(beanFactory)
+
+loadBeanDefinitions(beanFactory)
+
+XmlWebApplicationContext 类中的loadBeanDefinitions：
+
+```java
+public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationContext {
+    ...
+    protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
+        // 1.为指定BeanFactory创建XmlBeanDefinitionReader
+	XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+	// 2.使用此上下文的资源加载环境配置 XmlBeanDefinitionReader
+	beanDefinitionReader.setEnvironment(this.getEnvironment());
+	// resourceLoader赋值为XmlWebApplicationContext
+	beanDefinitionReader.setResourceLoader(this);
+	beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+	this.initBeanDefinitionReader(beanDefinitionReader);
+	// 3.加载 bean 定义
+	this.loadBeanDefinitions(beanDefinitionReader);
+    }
+...
+}
+```
+
+从上图中第四处注释的loadBeanDefinitions方法点进去，注意接下来好多方法都叫loadBeanDefinitions，层层点进去跟踪：
+
+```java
+public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationContext {
+    ...
+    protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws IOException {
+        //1.获取配置文件路径
+        String[] configLocations = this.getConfigLocations();
+        if (configLocations != null) {
+            String[] var3 = configLocations;
+            int var4 = configLocations.length;
+            for(int var5 = 0; var5 < var4; ++var5) {
+                String configLocation = var3[var5];
+                //2.根据配置文件路径加载 bean 定义
+                reader.loadBeanDefinitions(configLocation);
+            }
+        }
+    }
+ ...
+ }
+```
+
+
+
+层层点进去当看到XmlBeanDefinitionReader中第五个注释的`doLoadBeanDefinitions()`，要注意spring源码中但凡do开头的都是实际做事的！！！一定要走进去看:
+
+```java
+public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
+
+    ...
+
+    public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
+        Assert.notNull(encodedResource, "EncodedResource must not be null");
+        if (logger.isInfoEnabled()) {
+            logger.info("Loading XML bean definitions from " + encodedResource.getResource());
+	}	 
+	// 1.当前正在加载的EncodedResource
+	Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
+	if (currentResources == null) {
+	    currentResources = new HashSet<EncodedResource>(4);
+	    this.resourcesCurrentlyBeingLoaded.set(currentResources);
+	}
+	// 2.将当前encodedResource添加到currentResources
+	if (!currentResources.add(encodedResource)) {
+	    // 如果添加失败，代表当前的encodedResource已经存在，则表示出现了循环加载
+	    throw new BeanDefinitionStoreException("Detected cyclic loading of " + encodedResource + " - check your import definitions!");
+        }
+	try {
+	    // 3.拿到Resource的inputStream
+	    InputStream inputStream = encodedResource.getResource().getInputStream();
+	    try {
+	        // 4.将inputStream封装成org.xml.sax.InputSource
+	        InputSource inputSource = new InputSource(inputStream);
+                if (encodedResource.getEncoding() != null) {
+	        inputSource.setEncoding(encodedResource.getEncoding());
+	        }
+                =====================重点！！！！=========================================
+	        // 5.加载 bean 定义（方法以do开头，真正处理的方法）
+	        return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
+                ========================================================================
+	    } finally {
+	        inputStream.close();
+	    }
+        } catch (IOException ex) {
+            throw new BeanDefinitionStoreException("IOException parsing XML document from " + encodedResource.getResource(), ex);
+	} finally {
+	    currentResources.remove(encodedResource);
+	    if (currentResources.isEmpty()) {
+	        this.resourcesCurrentlyBeingLoaded.remove();
+            }
+        }
+    }
+
+    ...
+
 }
 ```
 
