@@ -639,7 +639,7 @@ public class MilkTea implements Cloneable{
 
 ## **一、适配器模式**
 
-说到适配器，我们最熟悉的莫过于[电源适配器](https://www.zhihu.com/search?q=%E7%94%B5%E6%BA%90%E9%80%82%E9%85%8D%E5%99%A8&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A1324509357%7D)了，也就是手机的充电头。它就是适配器模式的一个应用。
+说到适配器，我们最熟悉的莫过于电源适配器了，也就是手机的充电头。它就是适配器模式的一个应用。
 
 试想一下，你有一条连接电脑和手机的 USB 数据线，连接电脑的一端从电脑接口处接收 5V 的电压，连接手机的一端向手机输出 5V 的电压，并且他们工作良好。
 
