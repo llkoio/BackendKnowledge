@@ -5,6 +5,7 @@
 ## **resize()方法（扩容方法）**
 
 ```java
+
 final Node < K, V > [] resize() {
     // 把全局的table赋给新变量
     Node < K, V > [] oldTab = table;
@@ -21,12 +22,16 @@ final Node < K, V > [] resize() {
             threshold = Integer.MAX_VALUE;
             // 不用扩容了，因为已经超过或等于HashMap的最大容量了，直接返回旧table
             return oldTab;
+        // 否则就进行扩容，旧table的容量左移一位，相当于乘以2，赋值给新的table的容量，判断是否小于HashMap的最大容量限制，然后判断旧table的容量是否大于等于默认初始化容量（这里的意思就是必须大于等于默认初始化容量）
         } else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
             oldCap >= DEFAULT_INITIAL_CAPACITY)
+            // 计算新table的阈值赋值给新table的阈值变量，阈值的计算公式是：table的容量 * 负载因子，扩容之后新的table的容量是旧table容量的两倍，也就是新table的阈值的计算公式是：旧table容量 * 2 * 负载因子，其实就是直接在旧table阈值的基础上乘以2就可以，即oldThr << 1
             newThr = oldThr << 1; // double threshold
     } else if (oldThr > 0) // initial capacity was placed in threshold
         newCap = oldThr;
-    else { // zero initial threshold signifies using defaults
+    // 这个else是调用HashMap的无参构造方法的时候走的，把新table的容量赋值成默认初始化容量，把新table的阈值赋值成默认的阈值，即默认负载因子0.75 * 默认初始化容量16
+    // zero initial threshold signifies using defaults
+    else {
         newCap = DEFAULT_INITIAL_CAPACITY;
         newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
