@@ -13,6 +13,12 @@ xingshaocheng 的 https://github.com/xingshaocheng/architect-awesome 是初始�
 
 [![知识共享协议（CC协议）](https://img.shields.io/badge/License-Creative%20Commons-DC3D24.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)
 
+# jdk源码
+
+## HashMap
+
+* [jdk8的HashMap源码分析（基本逐行注释）](./article/hashmap/hashmap.md)
+
 # 数据结构
 
 ## 队列

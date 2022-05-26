@@ -7,9 +7,9 @@
 ```java
 
 final Node < K, V > [] resize() {
-    // 把全局的table赋给新变量
+    // 把全局的table赋给oldTab
     Node < K, V > [] oldTab = table;
-    // oldCap代表旧table的容量，如果oldTab==null，说明之前没有旧table，将其赋值零，否则赋值实际旧table容量
+    // oldCap代表旧table的容量，如果oldTab==null，说明之前没有table，将其赋值零，否则赋值实际旧table容量
     int oldCap = (oldTab == null) ? 0 : oldTab.length;
     // 将全局阈值threshold赋值给记录旧table阈值的变量（存在旧table的情况下）
     int oldThr = threshold;
