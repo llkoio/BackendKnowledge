@@ -27,6 +27,7 @@ final Node < K, V > [] resize() {
             oldCap >= DEFAULT_INITIAL_CAPACITY)
             // 计算新table的阈值赋值给新table的阈值变量，阈值的计算公式是：table的容量 * 负载因子，扩容之后新的table的容量是旧table容量的两倍，也就是新table的阈值的计算公式是：旧table容量 * 2 * 负载因子，其实就是直接在旧table阈值的基础上乘以2就可以，即oldThr << 1
             newThr = oldThr << 1; // double threshold
+    // I guess here is hashmap's construct function that have no args need to be
     } else if (oldThr > 0) // initial capacity was placed in threshold
         newCap = oldThr;
     // 这个else是调用HashMap的无参构造方法的时候走的，把新table的容量赋值成默认初始化容量，把新table的阈值赋值成默认的阈值，即默认负载因子0.75 * 默认初始化容量16
